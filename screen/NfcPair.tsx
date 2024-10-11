@@ -18,30 +18,19 @@ function NfcPair() {
   const [status, setStatus] = useState<CardStatus | null>(null);
   const [, setRedraw] = useState<number>(0);
 
-  /* async function getStatus() {
+  async function getStatus() {
     setStatus(await PortalDevice.getStatus());
-  } */
+  }
 
   useEffect(() => {
     console.log('NfcPair launched by', launchedBy);
-    PortalDevice.init()?.then(() => setRedraw(Math.random()));
-
-    // reading status from Portal device every few seconds
-    const statusTimer = setInterval(() => {
-      if (statusIntervalPaused) return;
-
-      PortalDevice.getStatus()
-        .then((stat: CardStatus) => {
-          console.log('status returned: ', stat);
-          setStatus(stat);
-          setRedraw(Math.random());
-        })
-        .catch(console.error);
-    }, 3000);
+    PortalDevice.startReading()?.then(() => {
+      getStatus();
+      setRedraw(Math.random())
+    });
 
     // Cleanup function
     return () => {
-      clearInterval(statusTimer);
       stopReading();
     };
   }, []);
